@@ -1,11 +1,13 @@
+const { log } = require("../small_packages/log.js")
+
 module.exports = {
     description: "ban a member",
-    catergory: "Moderation",
+    category: "Moderation",
     slash: true,
     minArgs: 1,
     usage: "<member> [reason]",
     
-    execute: async ({client, message, interaction, args}) => {
+    execute: async ({message, interaction, args}) => {
         if (message) {
             const tag = args.shift();
             
@@ -20,9 +22,10 @@ module.exports = {
                 return
             }
 
-            await member.ban({reason: `Banned by ${message.author.username} \nReason: ${reason}`}).then(() => {
+            await member.ban({reason: `Banned by ${message.author.username} \nReason: ${reason}`}).then(async () => {
                 await message.reply(`Banned <@${member_id}>`);
-            }).catch(() => {
+                await log(message, "720664199931625482", member, "Ban", reason);
+            }).catch(async () => {
                 await message.reply("Couldn't ban the specified member");
             })
         }
@@ -41,9 +44,10 @@ module.exports = {
                 return
             }
 
-            await member.ban({reason: `Banned by ${interaction.author.username} \nReason: ${reason}`}).then(() => {
+            await member.ban({reason: `Banned by ${interaction.author.username} \nReason: ${reason}`}).then(async () => {
                 await interaction.reply(`Banned <@${member_id}>`);
-            }).catch(() => {
+                await log(interaction, "720664199931625482", member, "Ban", reason);
+            }).catch(async () => {
                 await interaction.reply("Couldn't ban the specified member");
             })
         }

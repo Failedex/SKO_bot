@@ -1,11 +1,13 @@
+const {log} = require("../small_packages/log.js");
+
 module.exports = {
     description: "unban a member",
-    catergory: "Moderation",
+    category: "Moderation",
     slash: true,
     minArgs: 1,
     usage: "<member> [reason]",
     
-    execute: async ({client, message, interaction, args}) => {
+    execute: async ({message, interaction, args}) => {
         if (message) {
             const tag = args.shift();
             
@@ -22,6 +24,7 @@ module.exports = {
 
             message.guild.unban(member_id, `Unbanned by ${message.author.username} \nReason: ${reason}`).then(()=>{
                 message.reply(`Unbanned <@${member_id}>`)
+                log(message, "720664199931625482", member, "Unban", reason);
             }).catch(()=>{
                 message.reply("Unable to unban given member");
             });
@@ -43,6 +46,7 @@ module.exports = {
 
             interaction.guild.unban(member_id, `Unbanned by ${message.author.username} \nReason: ${reason}`).then(()=>{
                 interaction.reply(`Unbanned <@${member_id}>`)
+                log(interaction, "720664199931625482", member, "Unban", reason);
             }).catch(()=>{
                 interaction.reply("Unable to unban given member");
             });

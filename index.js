@@ -2,7 +2,6 @@ const Discord = require("discord.js");
 const {GatewayIntentBits} = require("discord.js");
 const dotenv = require("dotenv");
 const fs = require("fs");
-const { minArgs } = require("./commands/ping");
 
 dotenv.config();
 
@@ -31,7 +30,10 @@ client.on('ready', () => {
 
     for (const file of commandFiles) {
         const command = require(`./commands/${file}`);
-        if (!command.hasOwnProperty("description") || !command.hasOwnProperty("slash") || !command.hasOwnProperty("category")) throw Error("jeez at least tell me the description and the slash command info! o(≧口≦)o");
+        if (command.description === undefined|| command.slash === undefined|| command.category === undefined) {
+            console.log(file);
+            throw Error("jeez at least tell me the description and the slash command info! o(≧口≦)o");
+        }
 
         client.commands.set(file.replace(".js", ""), command);
 
