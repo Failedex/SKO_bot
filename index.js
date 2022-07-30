@@ -16,7 +16,7 @@ const client = new Discord.Client({
     ]
 });
 
-const prefix = ";";
+client.prefix = ";";
 
 client.on('ready', () => {
     console.log("logged in as " + client.user.tag);
@@ -24,7 +24,7 @@ client.on('ready', () => {
     // setting up the command handler
     const slash_commands = client.application.commands
     client.commands = new Discord.Collection();
-    client.colour = "#1f1e33";
+    client.colour = 0x1f1e33;
 
     const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith(".js"));
 
@@ -39,6 +39,7 @@ client.on('ready', () => {
 
         if (command.aliases) {
             for (const alias of command.aliases) {
+                command.hidden = true;
                 client.commands.set(alias, command)
             }
         }
@@ -55,8 +56,8 @@ client.on('ready', () => {
 })
 
 client.on('messageCreate', async (message) => {
-    if (!message.content.startsWith(prefix) || message.author.bot) return;
-    const args = message.content.slice(prefix.length).split(/ +/);
+    if (!message.content.startsWith(client.prefix) || message.author.bot) return;
+    const args = message.content.slice(client.prefix.length).split(/ +/);
     const commandName = args.shift().toLowerCase();
 
     if (!client.commands.has(commandName)) return;

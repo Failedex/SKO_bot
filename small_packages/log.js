@@ -5,6 +5,7 @@ const log = async (message, channel_id, member, action, reason) => {
     const embed = new EmbedBuilder()
     .setAuthor({name: `${member.user.tag}`, iconURL: member.user.avatarURL()})
     .setTitle(action)
+    .setColor(message.client.colour)
     .setDescription(`*Offender:* ${member.user.tag}\n*Reason:* ${reason}\n*Responsible Moderator:* ${message.author.username}${message.author.tag}`)
     .setFooter({text: `ID ${member.user.id}`})
     .setTimestamp()
