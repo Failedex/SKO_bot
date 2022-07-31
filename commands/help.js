@@ -1,4 +1,4 @@
-const { EmbedBuilder } = require("@discordjs/builders")
+const { EmbedBuilder, ApplicationCommandOptionType } = require("discord.js")
 
 module.exports = {
     description: "Give info about command or view all command",
@@ -6,11 +6,19 @@ module.exports = {
     slash: true,
     maxArgs: 1,
     usage: "[command]",
+    options: [{
+        name: "command",
+        description: "command to check info on", 
+        required: false,
+        type: ApplicationCommandOptionType.String
+    }],
     
     execute: async ({client, message, interaction, args}) => {
 
-        if (args[0]){
-            const command = client.commands.get(args[0]);
+        const arg = message? args[0]: interaction.options.getString('command');
+
+        if (arg){
+            const command = client.commands.get(arg);
             
             const embed = new EmbedBuilder()
             .setColor(client.colour)
@@ -22,9 +30,13 @@ module.exports = {
                 return 
             }
 
-            embed.setDescription(`**${args[0]}** -- ${command.description} \naliases: ${command.aliases? command.aliases.join(", "): ""} \nsyntax: \`${client.prefix}${args[0]} ${command.usage !== undefined?command.usage:""}\``);
+            embed.setDescription(`**${arg}** -- ${command.description} \naliases: ${command.aliases? command.aliases.join(", "): ""} \nsyntax: \`${client.prefix}${arg} ${command.usage !== undefined?command.usage:""}\``);
 
-            await message.reply({embeds: [embed]});
+            if (message) {
+                await message.reply({embeds: [embed]});
+            } else {
+                await interaction.reply({embeds: [embed]});
+            }
 
         } else {
             const embed = new EmbedBuilder()

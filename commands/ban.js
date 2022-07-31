@@ -1,4 +1,5 @@
 const { log } = require("../small_packages/log.js")
+const { ApplicationCommandOptionType } = require("discord.js")
 
 module.exports = {
     description: "ban a member",
@@ -6,6 +7,18 @@ module.exports = {
     slash: true,
     minArgs: 1,
     usage: "<member> [reason]",
+    options: [{
+        name: "member",
+        description: "member to ban", 
+        required: true,
+        type: ApplicationCommandOptionType.String
+    },
+    {
+        name: "reason",
+        description: "reason to ban member", 
+        required: false,
+        type: ApplicationCommandOptionType.String
+    }],
     
     execute: async ({message, interaction, args}) => {
         if (message) {
@@ -31,11 +44,11 @@ module.exports = {
         }
 
         if (interaction) {
-            const tag = args.shift();
+            const tag = interaction.options.getString("member");
             
             const member_id = tag.replace("<@!", "").replace(">", "");
 
-            const reason = args.join(" ");
+            const reason = interaction.options.getString("reason");
 
             const member = await interaction.guild.members.fetch(member_id);
 
@@ -44,9 +57,9 @@ module.exports = {
                 return
             }
 
-            await member.ban({reason: `Banned by ${interaction.author.username} \nReason: ${reason}`}).then(async () => {
-                await interaction.reply(`Banned <@${member_id}>`);
+            await member.ban({reason: `Banned by ${interaction.user.username} \nReason: ${reason}`}).then(async () => {
                 await log(interaction, "720664199931625482", member, "Ban", reason);
+                await interaction.reply(`Banned <@${member_id}>`);
             }).catch(async () => {
                 await interaction.reply("Couldn't ban the specified member");
             })
