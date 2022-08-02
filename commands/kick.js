@@ -1,5 +1,5 @@
 const {log} = require("../small_packages/log.js");
-const {ApplicationCommandOptionType} = require("discord.js")
+const {ApplicationCommandOptionType, PermissionsBitField} = require("discord.js")
 
 module.exports = {
     description: "kick a member",
@@ -21,6 +21,11 @@ module.exports = {
     }],
     
     execute: async ({message, interaction, args}) => {
+
+        if (!message.member.permissions.has(PermissionsBitField.Flags.KickMembers)) {
+            await message.reply("You don't have permission to kick");
+        }
+
         if (message) {
             const tag = args.shift();
             
@@ -45,6 +50,9 @@ module.exports = {
         }
 
         if (interaction) {
+            if (!interaction.member.permissions.has(PermissionsBitField.Flags.KickMembers)) {
+                await interaction.reply("You don't have permission to kick");
+            }
             const tag = interaction.options.getString("member");
             
             const member_id = tag.replace("<@!", "").replace(">", "");

@@ -1,5 +1,5 @@
 const { log } = require("../small_packages/log.js")
-const { ApplicationCommandOptionType } = require("discord.js")
+const { ApplicationCommandOptionType , PermissionsBitField} = require("discord.js")
 
 module.exports = {
     description: "ban a member",
@@ -22,6 +22,10 @@ module.exports = {
     
     execute: async ({message, interaction, args}) => {
         if (message) {
+            if (!message.member.permissions.has(PermissionsBitField.Flags.BanMembers)) {
+                await message.reply("You don't have permission to ban");
+            }
+
             const tag = args.shift();
             
             const member_id = tag.replace("<@!", "").replace(">", "");
@@ -44,8 +48,12 @@ module.exports = {
         }
 
         if (interaction) {
-            const tag = interaction.options.getString("member");
+            if (!interaction.member.permissions.has(PermissionsBitField.Flags.BanMembers)) {
+                await interaction.reply("You don't have permission to ban");
+            }
             
+            const tag = interaction.options.getString("member");
+
             const member_id = tag.replace("<@!", "").replace(">", "");
 
             const reason = interaction.options.getString("reason");
