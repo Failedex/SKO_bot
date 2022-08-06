@@ -4,8 +4,6 @@ const { ApplicationCommandOptionType , PermissionsBitField} = require("discord.j
 module.exports = {
     description: "ban a member",
     category: "Moderation",
-    slash: true,
-    minArgs: 1,
     usage: "<member> [reason]",
     options: [{
         name: "member",
@@ -20,57 +18,30 @@ module.exports = {
         type: ApplicationCommandOptionType.String
     }],
     
-    execute: async ({message, interaction, args}) => {
-        if (message) {
-            if (!message.member.permissions.has(PermissionsBitField.Flags.BanMembers)) {
-                await message.reply("You don't have permission to ban");
-            }
+    execute: async ({interaction}) => {
 
-            const tag = args.shift();
-            
-            const member_id = tag.replace("<@!", "").replace(">", "");
+        if (!interaction.member.permissions.has(PermissionsBitField.Flags.BanMembers)) {
+            await interaction.reply("You don't have permission to ban");
+        }
+        
+        const tag = interaction.options.getString("member");
 
-            const reason = args.join(" ");
+        const member_id = tag.replace("<@!", "").replace(">", "");
 
-            const member = await message.guild.members.fetch(member_id);
+        const reason = interaction.options.getString("reason");
 
-            if (!member) {
-                await message.reply("Couldn't find the specified member");
-                return
-            }
+        const member = await interaction.guild.members.fetch(member_id);
 
-            await member.ban({reason: `Banned by ${message.author.username} \nReason: ${reason}`}).then(async () => {
-                await message.reply(`Banned <@${member_id}>`);
-                await log(message, "720664199931625482", member, "Ban", reason);
-            }).catch(async () => {
-                await message.reply("Couldn't ban the specified member");
-            })
+        if (!member) {
+            await interaction.reply("Couldn't find the specified member");
+            return
         }
 
-        if (interaction) {
-            if (!interaction.member.permissions.has(PermissionsBitField.Flags.BanMembers)) {
-                await interaction.reply("You don't have permission to ban");
-            }
-            
-            const tag = interaction.options.getString("member");
-
-            const member_id = tag.replace("<@!", "").replace(">", "");
-
-            const reason = interaction.options.getString("reason");
-
-            const member = await interaction.guild.members.fetch(member_id);
-
-            if (!member) {
-                await interaction.reply("Couldn't find the specified member");
-                return
-            }
-
-            await member.ban({reason: `Banned by ${interaction.user.username} \nReason: ${reason}`}).then(async () => {
-                await log(interaction, "720664199931625482", member, "Ban", reason);
-                await interaction.reply(`Banned <@${member_id}>`);
-            }).catch(async () => {
-                await interaction.reply("Couldn't ban the specified member");
-            })
-        }
+        await member.ban({reason: `Banned by ${interaction.user.username} \nReason: ${reason}`}).then(async () => {
+            await log(interaction, "720664199931625482", member, "Ban", reason);
+            await interaction.reply(`Banned <@${member_id}>`);
+        }).catch(async () => {
+            await interaction.reply("Couldn't ban the specified member");
+        })
     }
 }

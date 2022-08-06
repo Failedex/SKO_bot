@@ -4,22 +4,16 @@ module.exports = {
     // these 3 are compulsory
     description: 'pong!',
     category: 'Configuration',
-    slash: false,
 
-    aliases: [],
-
-    // will work on later
+    // whether it should be seen by the help command
     hidden: false,
-    // not required but there if you want
-    minArgs: 0,
-    maxArgs: 0,
 
-    execute: async ({client, message}) => {
+    execute: async ({client, interaction}) => {
         const embed = new EmbedBuilder()
         .setTitle("pong")
         .setColor(client.colour)
-        .setDescription(`Latency is **${Date.now() - message.createdTimestamp}ms.**`)
+        .setDescription(`Latency is **${Date.now() - interaction.createdTimestamp}ms.**`)
 
-        await message.reply({embeds: [embed]});
+        await interaction.reply({embeds: [embed]});
     }
 }

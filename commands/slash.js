@@ -1,21 +1,34 @@
+const {ApplicationCommandOptionType} = require("discord.js");
 
 module.exports = {
     description: "Delete slash commands",
     category: "Configuration",
-    slash: false,
-    minArgs: 1,
-    maxArgs: 1,
+    usage: "<command name or id>",
+    options: [{
+        name: "command",
+        description: "command to delete",
+        required: true,
+        type: ApplicationCommandOptionType.String
+    }],
 
-    execute: async ({message, args}) => {
-        const guild = message.guild;
-        const command = guild.commands.cache.find(c => c.id === args[0] || c.name === args[0]);
+    execute: async ({interaction}) => {
+        const guild = interaction.guild;
+
+        const arg = interaction.options.getString("command");
+
+        if (arg === "slash") {
+            interaction.reply("You can't do that :(");
+            return
+        }
+        
+        const command = guild.commands.cache.find(c => c.id === arg || c.name === arg);
 
         if (!command) {
-            message.reply("Slash command not found");
+            interaction.reply("Slash command not found");
             return
         }
 
         await command.delete()
-        await message.reply("slahs command removed for this guild");
+        await interaction.reply("slahs command removed for this guild");
     }
 }

@@ -3,8 +3,6 @@ const { EmbedBuilder, ApplicationCommandOptionType } = require("discord.js")
 module.exports = {
     description: "Give info about command or view all command",
     category: "help",
-    slash: true,
-    maxArgs: 1,
     usage: "[command]",
     options: [{
         name: "command",
@@ -13,9 +11,9 @@ module.exports = {
         type: ApplicationCommandOptionType.String
     }],
     
-    execute: async ({client, message, interaction, args}) => {
+    execute: async ({client, interaction}) => {
 
-        const arg = message? args[0]: interaction.options.getString('command');
+        const arg = interaction.options.getString('command');
 
         if (arg){
             const command = client.commands.get(arg);
@@ -26,17 +24,13 @@ module.exports = {
 
             if (!command) {
                 embed.setDescription("Command not found.")
-                message.reply({embeds: [embed]})
+                interaction.reply({embeds: [embed]})
                 return 
             }
 
-            embed.setDescription(`**${arg}** -- ${command.description} \naliases: ${command.aliases? command.aliases.join(", "): ""} \nsyntax: \`${client.prefix}${arg} ${command.usage !== undefined?command.usage:""}\``);
+            embed.setDescription(`**${arg}** -- ${command.description} \nusage: \`${command.usage !== undefined?command.usage:""}\``);
 
-            if (message) {
-                await message.reply({embeds: [embed]});
-            } else {
-                await interaction.reply({embeds: [embed]});
-            }
+            await interaction.reply({embeds: [embed]});
 
         } else {
             const embed = new EmbedBuilder()
@@ -59,11 +53,7 @@ module.exports = {
                 embed.addFields({name: category, value: commands.join(" | ")});
             }
 
-            if (message) {
-                await message.reply({embeds: [embed]});
-            } else {
-                await interaction.reply({embeds: [embed]});
-            }
+            await interaction.reply({embeds: [embed]});
         }
     }
 }
