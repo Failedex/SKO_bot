@@ -2,8 +2,10 @@ const Discord = require("discord.js");
 const {GatewayIntentBits} = require("discord.js");
 const dotenv = require("dotenv");
 const fs = require("fs");
+const sqlite3 = require("sqlite3");
 
 dotenv.config();
+const mod_db = sqlite3.Database("./small_packages/moderation.db");
 
 const client = new Discord.Client({
     intents: [
@@ -64,6 +66,33 @@ client.on("interactionCreate", async (interaction) => {
             console.error(error);
         }
     }
+})
+
+// remember to unmute when needed
+const sko = client.guilds.cache.get("680152209450991780");
+const muted = sko.roles.cache.get("694312034464170066");
+
+mod_db.serialize(() => {
+    mod_db.each("SELECT * FROM mutes", (err, row) => {
+        if (err) {
+            console.error(err);
+            return
+        }
+
+        const unmute = (member_id) => {
+            const member = sko.members.fetch(member_id);
+
+            if (member.roles.cache.get(muted)) {
+                member.roles.remove(muted, "Auto unmute");
+            }
+        };
+
+        if (row.mute_start + row.mute_length > Date.now()) {
+            unmute(row.member_id);
+        } else {
+            setTimeout(unmute(row.member_id), Date.now() - row.mute_start + row.mute_length);
+        }
+    });
 })
 
 client.login(process.env.TOKEN);

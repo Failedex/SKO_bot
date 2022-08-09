@@ -18,7 +18,8 @@
   "homepage": "https://github.com/Failedex/SKO_bot#readme",
   "dependencies": {
     "discord.js": "^14.0.3",
-    "dotenv": "^16.0.1"
+    "dotenv": "^16.0.1",
+    "sqlite3": "^5.0.11"
   },
   "devDependencies": {
     "eslint": "^8.20.0"
