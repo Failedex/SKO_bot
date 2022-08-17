@@ -22,6 +22,7 @@ module.exports = {
 
         if (!interaction.member.permissions.has(PermissionsBitField.Flags.BanMembers)) {
             await interaction.reply("You don't have permission to unban");
+            return
         }
         const tag = interaction.options.getString("member");
         

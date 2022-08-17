@@ -1,4 +1,4 @@
-const {ApplicationCommandOptionType} = require("discord.js");
+const {ApplicationCommandOptionType, PermissionsBitField} = require("discord.js");
 
 module.exports = {
     description: "Delete slash commands",
@@ -12,6 +12,12 @@ module.exports = {
     }],
 
     execute: async ({interaction}) => {
+
+        if (!interaction.member.has(PermissionsBitField.Flags.Administrator)) {
+            await interaction.reply("you don't have permissions to do this");
+            return 
+        }
+
         const guild = interaction.guild;
 
         const arg = interaction.options.getString("command");

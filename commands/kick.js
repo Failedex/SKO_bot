@@ -22,12 +22,9 @@ module.exports = {
 
         if (!interaction.member.permissions.has(PermissionsBitField.Flags.KickMembers)) {
             await interaction.reply("You don't have permission to kick");
+            return 
         }
 
-
-        if (!interaction.member.permissions.has(PermissionsBitField.Flags.KickMembers)) {
-            await interaction.reply("You don't have permission to kick");
-        }
         const tag = interaction.options.getString("member");
         
         const member_id = tag.replace("<@!", "").replace(">", "");

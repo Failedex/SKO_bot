@@ -2,10 +2,10 @@ const Discord = require("discord.js");
 const {GatewayIntentBits} = require("discord.js");
 const dotenv = require("dotenv");
 const fs = require("fs");
-const sqlite3 = require("sqlite3");
+// const sqlite3 = require("sqlite3").verbose();
 
 dotenv.config();
-const mod_db = sqlite3.Database("./small_packages/moderation.db");
+// const mod_db = new sqlite3.Database("./small_packages/moderation.db");
 
 const client = new Discord.Client({
     intents: [
@@ -45,6 +45,36 @@ client.on('ready', () => {
             options: command.options
         })
     }
+    // remember to unmute when needed
+
+//     mod_db.serialize(async () => {
+//         const sko = await client.guilds.fetch("680152209450991780");
+        
+//         const muted = sko.roles.cache.get("694312034464170066");
+
+//         mod_db.each("SELECT * FROM mutes", (err, row) => {
+//             if (err) {
+//                 console.error(err);
+//                 return
+//             }
+
+//             const unmute = async (member_id) => {
+//                 const member = sko.members.fetch(member_id);
+
+//                 if (member.roles.cache.get(muted)) {
+//                     member.roles.remove(muted, "Auto unmute");
+//                 }
+
+//                 mod_db.run("DELETE FROM mutes WHERE member_id = ?", member_id);
+//             };
+
+//             if (row.mute_start + row.mute_length > Date.now()) {
+//                 unmute(row.member_id);
+//             } else {
+//                 setTimeout(unmute(row.member_id), Date.now() - row.mute_start + row.mute_length);
+//             }
+//         });
+//     })
 })
 
 client.on('messageCreate', async (message) => {
@@ -68,31 +98,5 @@ client.on("interactionCreate", async (interaction) => {
     }
 })
 
-// remember to unmute when needed
-const sko = client.guilds.cache.get("680152209450991780");
-const muted = sko.roles.cache.get("694312034464170066");
-
-mod_db.serialize(() => {
-    mod_db.each("SELECT * FROM mutes", (err, row) => {
-        if (err) {
-            console.error(err);
-            return
-        }
-
-        const unmute = (member_id) => {
-            const member = sko.members.fetch(member_id);
-
-            if (member.roles.cache.get(muted)) {
-                member.roles.remove(muted, "Auto unmute");
-            }
-        };
-
-        if (row.mute_start + row.mute_length > Date.now()) {
-            unmute(row.member_id);
-        } else {
-            setTimeout(unmute(row.member_id), Date.now() - row.mute_start + row.mute_length);
-        }
-    });
-})
 
 client.login(process.env.TOKEN);
