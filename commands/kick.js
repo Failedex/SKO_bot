@@ -9,7 +9,7 @@ module.exports = {
         name: "member",
         description: "member to ban", 
         required: true,
-        type: ApplicationCommandOptionType.String
+        type: ApplicationCommandOptionType.User
     },
     {
         name: "reason",
@@ -18,20 +18,18 @@ module.exports = {
         type: ApplicationCommandOptionType.String
     }],
     
-    execute: async ({interaction}) => {
+    execute: async ({interaction, client}) => {
 
         if (!interaction.member.permissions.has(PermissionsBitField.Flags.KickMembers)) {
             await interaction.reply("You don't have permission to kick");
             return 
         }
 
-        const tag = interaction.options.getString("member");
-        
-        const member_id = tag.replace("<@!", "").replace(">", "");
-
         const reason = interaction.options.getString("reason");
 
-        const member = await interaction.guild.members.fetch(member_id);
+        const user = await interaction.options.getUser("member");
+
+        const member = await interaction.guild.members.fetch(user);
 
         if (!member) {
             await interaction.reply("Couldn't find the specified member");
@@ -39,8 +37,8 @@ module.exports = {
         }
 
         await member.kick({reason: `Kicked by ${interaction.user.username} \nReason: ${reason}`}).then(async () => {
-            await log(interaction, "720664199931625482", member, "Kick", reason);
-            await interaction.reply(`Kicked <@${member_id}>`);
+            await log(interaction, client.log_channel, member, "Kick", reason);
+            await interaction.reply(`Kicked ${member.tag}`);
         }).catch(async () => {
             await interaction.reply("Couldn't kick the specified member");
         })

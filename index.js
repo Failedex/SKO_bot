@@ -26,6 +26,7 @@ client.on('ready', () => {
     const slash_commands = client.application.commands
     client.commands = new Discord.Collection();
     client.colour = 0x1f1e33;
+    client.log_channel = "893763079542825010";
 
     const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith(".js"));
 

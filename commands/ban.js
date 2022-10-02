@@ -9,7 +9,7 @@ module.exports = {
         name: "member",
         description: "member to ban", 
         required: true,
-        type: ApplicationCommandOptionType.String
+        type: ApplicationCommandOptionType.User
     },
     {
         name: "reason",
@@ -25,13 +25,11 @@ module.exports = {
             return
         }
         
-        const tag = interaction.options.getString("member");
-
-        const member_id = tag.replace("<@!", "").replace(">", "");
-
         const reason = interaction.options.getString("reason");
 
-        const member = await interaction.guild.members.fetch(member_id);
+        const user = await interaction.options.getUser("member");
+
+        const member = await interaction.guild.members.fetch(user);
 
         if (!member) {
             await interaction.reply("Couldn't find the specified member");
@@ -40,7 +38,7 @@ module.exports = {
 
         await member.ban({reason: `Banned by ${interaction.user.username} \nReason: ${reason}`}).then(async () => {
             await log(interaction, "720664199931625482", member, "Ban", reason);
-            await interaction.reply(`Banned <@${member_id}>`);
+            await interaction.reply(`Banned ${member.tag}`);
         }).catch(async () => {
             await interaction.reply("Couldn't ban the specified member");
         })

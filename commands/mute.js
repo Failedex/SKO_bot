@@ -9,7 +9,7 @@ module.exports = {
         name: "member",
         description: "member to mute", 
         required: true,
-        type: ApplicationCommandOptionType.String
+        type: ApplicationCommandOptionType.User
     },
     {
         name: "time",
@@ -24,22 +24,20 @@ module.exports = {
         type: ApplicationCommandOptionType.String
     }],
 
-    execute: async ({interaction}) => {
+    execute: async ({client, interaction}) => {
         
         if (!interaction.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
             await interaction.reply("You don't have permission to mute");
             return 
         }
 
-        const tag = interaction.options.getString("member");
+        const reason = await interaction.options.getString("reason");
 
-        const member_id = tag.replace("<@!", "").replace(">", "");
+        const user = await interaction.options.getUser("member");
 
-        const reason = interaction.options.getString("reason");
-
-        const member = await interaction.guild.members.fetch(member_id);
+        const member = await interaction.guild.members.fetch(user);
         
-        const mutetime = interaction.options.getString("time");
+        const mutetime = await interaction.options.getString("time");
 
         let hours;
 
@@ -61,6 +59,11 @@ module.exports = {
             hours = parseInt(mutetime);
         }
 
+        if (user.bot) {
+            await interaction.reply("Unable to timeout bot");
+            return
+        }
+
         if (!member) {
             await interaction.reply("Couldn't find the specified member");
             return 
@@ -71,10 +74,11 @@ module.exports = {
             return
         }
 
-        await member.timeout(hours * 60 * 1000).then(async () => {
-            await log(interaction, "720664199931625482", member, "Timeout", reason);
-            await interaction.reply(`Muted <@${member_id}> for ${hours}hours`);
-        }).catch(async () => {
+        await member.timeout(hours * 60 * 60 * 1000).then(async () => {
+            await log(interaction, client.log_channel, member, "Timeout (" + hours + " hours)", reason);
+            await interaction.reply(`Muted <@${member.id}> for ${hours} hours`);
+        }).catch(async (err) => {
+            console.error(err)
             await interaction.reply("Couldn't mute the specified member")
         });
 
